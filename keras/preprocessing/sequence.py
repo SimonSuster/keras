@@ -56,7 +56,8 @@ def skipgrams(sequence, vocabulary_size,
         and label=0 if 'other_word' is ramdomly sampled
 
         @param vocabulary_size: int. maximum possible word index + 1
-        @param window_size: int. actually half-window. The window of a word wi will be [i-window_size, i+window_size+1]
+        @param window_size: int. actually maximum half-window size.
+            The final window size of a word will be a random integer r in range(1, window_size): [i-r, i+r+1]
         @param negative_samples: float >= 0. 0 for no negative (=random) samples. 1 for same number as positive samples. etc.
         @param categorical: bool. if False, labels will be integers (eg. [0, 1, 1 .. ]), 
             if True labels will be categorical eg. [[1,0],[0,1],[0,1] .. ]
@@ -72,8 +73,9 @@ def skipgrams(sequence, vocabulary_size,
             if sampling_table[wi] < random.random():
                 continue
 
-        window_start = max(0, i-window_size)
-        window_end = min(len(sequence), i+window_size+1)
+        reduced_window_size = random.randint(1, window_size)
+        window_start = max(0, i-reduced_window_size)
+        window_end = min(len(sequence), i+reduced_window_size+1)
         for j in range(window_start, window_end):
             if j != i:
                 wj = sequence[j]
