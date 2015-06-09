@@ -92,6 +92,7 @@ class WordContextProduct(Layer):
         c = self.W_c[X[:, 1]] # nb_samples, proj_dim
 
         dot = T.sum(w * c, axis=1)
+
         dot = theano.tensor.reshape(dot, (X.shape[0], 1))
         return self.activation(dot)
 

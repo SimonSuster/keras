@@ -66,6 +66,7 @@ def skipgrams(sequence, vocabulary_size,
     '''
     couples = []
     labels = []
+
     for i, wi in enumerate(sequence):
         if not wi:
             continue
@@ -73,7 +74,8 @@ def skipgrams(sequence, vocabulary_size,
             if sampling_table[wi] < random.random():
                 continue
 
-        reduced_window_size = random.randint(1, window_size)
+        #reduced_window_size = random.randint(1, window_size)
+        reduced_window_size = window_size
         window_start = max(0, i-reduced_window_size)
         window_end = min(len(sequence), i+reduced_window_size+1)
         for j in range(window_start, window_end):

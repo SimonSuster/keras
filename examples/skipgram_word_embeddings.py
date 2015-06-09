@@ -34,6 +34,7 @@ import numpy as np
 import theano
 import six.moves.cPickle
 import os, re, json
+import time
 
 from keras.preprocessing import sequence, text
 from keras.optimizers import SGD, RMSprop, Adagrad
@@ -43,10 +44,12 @@ from keras.layers.embeddings import WordContextProduct, Embedding
 from six.moves import range
 from six.moves import zip
 
-max_features = 50000 # vocabulary size: top 50,000 most common words in data
+max_features = 10000 # vocabulary size: top 50,000 most common words in data
 skip_top = 100 # ignore top 100 most common words
 nb_epoch = 1
-dim_proj = 256 # embedding space dimension
+dim_proj = 100 # embedding space dimension
+
+
 
 save = True
 load_model = False
@@ -57,8 +60,8 @@ model_load_fname = "HN_skipgram_model.pkl"
 model_save_fname = "HN_skipgram_model.pkl"
 tokenizer_fname = "HN_tokenizer.pkl"
 
-data_path = os.path.expanduser("~/")+"HNCommentsAll.1perline.json"
-
+#data_path = os.path.expanduser("~/")+"HNCommentsAll.1perline.json"
+data_path = "/home/p262594/Datasets/HNCommentsAll.1000.1perline.json"
 # text preprocessing utils
 html_tags = re.compile(r'<.*?>')
 to_replace = [('&#x27;', "'")]
@@ -107,9 +110,11 @@ if train_model:
         model = Sequential()
         model.add(WordContextProduct(max_features, proj_dim=dim_proj, init="uniform"))
         model.compile(loss='mse', optimizer='rmsprop')
+        #model.compile(loss='binary_crossentropy', optimizer='rmsprop')
 
     sampling_table = sequence.make_sampling_table(max_features)
 
+    start = time.time()
     for e in range(nb_epoch):
         print('-'*40)
         print('Epoch', e)
@@ -121,7 +126,7 @@ if train_model:
         
         for i, seq in enumerate(tokenizer.texts_to_sequences_generator(text_generator())):
             # get skipgram couples for one text in the dataset
-            couples, labels = sequence.skipgrams(seq, max_features, window_size=4, negative_samples=1., sampling_table=sampling_table)
+            couples, labels = sequence.skipgrams(seq, max_features, window_size=3, negative_samples=1., sampling_table=sampling_table)
             if couples:
                 # one gradient update per sentence (one sentence = a few 1000s of word couples)
                 X = np.array(couples, dtype="int32")
@@ -133,6 +138,8 @@ if train_model:
                 samples_seen += len(labels)
         print('Samples seen:', samples_seen)
     print("Training completed!")
+    end = time.time()
+    print(end - start)
 
     if save:
         print("Saving model...")
@@ -212,4 +219,3 @@ for w in words:
     print('====', w)
     for r in res:
         print(r)
-

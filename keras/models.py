@@ -13,6 +13,7 @@ import time, copy
 from .utils.generic_utils import Progbar, printv
 from six.moves import range
 
+
 def standardize_y(y):
     if not hasattr(y, 'shape'):
         y = np.asarray(y)
@@ -66,9 +67,11 @@ class Model(object):
 
         # input of model 
         self.X_train = self.get_input(train=True)
+
         self.X_test = self.get_input(train=False)
 
         self.y_train = self.get_output(train=True)
+
         self.y_test = self.get_output(train=False)
 
         # target of model
@@ -99,9 +102,9 @@ class Model(object):
             test_ins = [self.X_test, self.y]
             predict_ins = [self.X_test]
 
-        self._train = theano.function(train_ins, train_loss, 
-            updates=updates, allow_input_downcast=True, mode=theano_mode)
-        self._train_with_acc = theano.function(train_ins, [train_loss, train_accuracy], 
+        self._train = theano.function(train_ins, train_loss,
+        updates=updates, allow_input_downcast=True, mode=theano_mode)
+        self._train_with_acc = theano.function(train_ins, [train_loss, train_accuracy],
             updates=updates, allow_input_downcast=True, mode=theano_mode)
         self._predict = theano.function(predict_ins, self.y_test, 
             allow_input_downcast=True, mode=theano_mode)
@@ -166,6 +169,7 @@ class Sequential(Model):
         X = standardize_X(X)
         y = standardize_y(y)
         ins = X + [y]
+
         if accuracy:
             return self._train_with_acc(*ins)
         else:
