@@ -43,23 +43,26 @@ from keras.layers.embeddings import WordContextProduct, Embedding
 from six.moves import range
 from six.moves import zip
 
-max_features = 50000 # vocabulary size: top 50,000 most common words in data
+max_features = 12901 # vocabulary size: top 50,000 most common words in data
 skip_top = 100 # ignore top 100 most common words
-nb_epoch = 1
-dim_proj = 256 # embedding space dimension
+nb_epoch = 2
+dim_proj = 50 # embedding space dimension
 
 save = True
 load_model = False
 load_tokenizer = False
 train_model = True
-save_dir = os.path.expanduser("~/.keras/models")
+#save_dir = os.path.expanduser("~/.keras/models")
+save_dir = "/home/p262594/Apps/keras/output"
 model_load_fname = "HN_skipgram_model.pkl"
-model_save_fname = "HN_skipgram_model.pkl"
-tokenizer_fname = "HN_tokenizer.pkl"
+model_save_fname = "bllip100k_skip100_ep2_dim50_maxf12901.pkl"
+tokenizer_fname = "bllip100k_skip100_maxf50k_tok.pkl"
 
-data_path = os.path.expanduser("~/")+"HNCommentsAll.1perline.json"
-
+#data_path = os.path.expanduser("~/")+"HNCommentsAll.1perline.json"
+#data_path = "/home/p262594/Datasets/HNCommentsAll.1perline.json"
+data_path = "/home/p262594/projects/BilingualMultisense/bimu/data/bllip_100k"
 # text preprocessing utils
+"""
 html_tags = re.compile(r'<.*?>')
 to_replace = [('&#x27;', "'")]
 hex_tags = re.compile(r'&.*?;')
@@ -71,16 +74,15 @@ def clean_comment(comment):
         c = c.replace(tag, char)
     c = hex_tags.sub(' ', c)
     return c
+"""
+
 
 def text_generator(path=data_path):
     f = open(path)
     for i, l in enumerate(f):
-        comment_data = json.loads(l)
-        comment_text = comment_data["comment_text"]
-        comment_text = clean_comment(comment_text)
         if i % 10000 == 0:
             print(i)
-        yield comment_text
+        yield l
     f.close()
 
 # model management
@@ -121,7 +123,7 @@ if train_model:
         
         for i, seq in enumerate(tokenizer.texts_to_sequences_generator(text_generator())):
             # get skipgram couples for one text in the dataset
-            couples, labels = sequence.skipgrams(seq, max_features, window_size=4, negative_samples=1., sampling_table=sampling_table)
+            couples, labels = sequence.skipgrams(seq, max_features, window_size=3, negative_samples=1., sampling_table=sampling_table)
             if couples:
                 # one gradient update per sentence (one sentence = a few 1000s of word couples)
                 X = np.array(couples, dtype="int32")
