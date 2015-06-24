@@ -44,7 +44,7 @@ from six.moves import range
 from six.moves import zip
 
 max_features = 12901 # vocabulary size: top 50,000 most common words in data
-skip_top = 100 # ignore top 100 most common words
+skip_top = 0 # ignore top 100 most common words
 nb_epoch = 2
 dim_proj = 50 # embedding space dimension
 
@@ -75,6 +75,10 @@ def clean_comment(comment):
     c = hex_tags.sub(' ', c)
     return c
 """
+
+
+def cosine(x, y):
+    return np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))
 
 
 def text_generator(path=data_path):
@@ -130,7 +134,8 @@ if train_model:
                 loss = model.train(X, labels)
                 losses.append(loss)
                 if len(losses) % 100 == 0:
-                    progbar.update(i, values=[("loss", np.mean(losses))])
+                    progbar.update(i, values=[("loss", np.mean(losses)),
+                                              ("cosFrGe", cosine(model.layers[0].get_weights()[0][tokenizer.word_index["France"]], model.layers[0].get_weights()[0][tokenizer.word_index["Germany"]]))])
                     losses = []
                 samples_seen += len(labels)
         print('Samples seen:', samples_seen)
