@@ -37,7 +37,7 @@ def one_hot(text, n, filters=base_filter(), lower=True, split=" "):
 
 
 class Tokenizer(object):
-    def __init__(self, nb_words=None, filters=base_filter(), lower=True, split=" "):
+    def __init__(self, nb_words=None, filters=base_filter(), lower=False, split=" "):
         self.word_counts = {}
         self.word_docs = {}
         self.filters = filters
