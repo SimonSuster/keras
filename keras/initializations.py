@@ -3,7 +3,7 @@ import theano
 import theano.tensor as T
 import numpy as np
 
-from .utils.theano_utils import sharedX, shared_zeros
+from .utils.theano_utils import sharedX, shared_zeros, shared_ones
 
 def get_fans(shape):
     fan_in = shape[0] if len(shape) == 2 else np.prod(shape[1:])
@@ -22,7 +22,7 @@ def lecun_uniform(shape):
         http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf
     '''
     fan_in, fan_out = get_fans(shape)
-    scale = 1./np.sqrt(fan_in)
+    scale = np.sqrt(3. / fan_in)
     return uniform(shape, scale)
 
 def glorot_normal(shape):
@@ -34,7 +34,7 @@ def glorot_normal(shape):
 
 def glorot_uniform(shape):
     fan_in, fan_out = get_fans(shape)
-    s = np.sqrt(2. / (fan_in + fan_out))
+    s = np.sqrt(6. / (fan_in + fan_out))
     return uniform(shape, s)
     
 def he_normal(shape):
@@ -46,7 +46,7 @@ def he_normal(shape):
 
 def he_uniform(shape):
     fan_in, fan_out = get_fans(shape)
-    s = np.sqrt(2. / fan_in)
+    s = np.sqrt(6. / fan_in)
     return uniform(shape, s)
 
 def orthogonal(shape, scale=1.1):
@@ -59,8 +59,17 @@ def orthogonal(shape, scale=1.1):
     q = q.reshape(shape)
     return sharedX(scale * q[:shape[0], :shape[1]])
 
+def identity(shape, scale=1):
+    if len(shape) != 2 or shape[0] != shape[1]:
+        raise Exception("Identity matrix initialization can only be used for 2D square matrices")
+    else:
+        return sharedX(scale * np.identity(shape[0]))
+
 def zero(shape):
     return shared_zeros(shape)
+
+def one(shape):
+    return shared_ones(shape)
 
 
 from .utils.generic_utils import get_from_module

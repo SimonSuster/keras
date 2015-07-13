@@ -1,6 +1,6 @@
 ## Usage of callbacks
 
-A callback is a set of functions to be applied at given stages of the training procedure. You can use callbacks to get a view on internal states and statistics of the model during training. You can pass a list of callback (as the keyword argument `callbacks`) to the `.fit()` method of the `Sequential` model. The relevant methods of the callbacks will then be called at each stage of the training. 
+A callback is a set of functions to be applied at given stages of the training procedure. You can use callbacks to get a view on internal states and statistics of the model during training. You can pass a list of callbacks (as the keyword argument `callbacks`) to the `.fit()` method of the `Sequential` model. The relevant methods of the callbacks will then be called at each stage of the training. 
 
 ---
 
@@ -27,6 +27,23 @@ The `logs` dictionary will contain keys for quantities relevant to the current b
 
 ---
 
+## Available callbacks
+
+```python
+keras.callbacks.ModelCheckpoint(filepath, verbose=0, save_best_only=False)
+```
+
+Save the model after every epoch. If `save_best_only=True`, the latest best model according to the validation loss will not be overwritten. 
+
+
+```python
+keras.callbacks.EarlyStopping(monitor='val_loss', patience=0, verbose=0)
+```
+
+Stop training after no improvement of the metric `monitor` is seen for `patience` epochs.
+
+---
+
 
 ## Create a callback
 
@@ -44,11 +61,11 @@ class LossHistory(keras.callbacks.Callback):
 
 ---
 
-### Example to record the loss history
+### Example: recording loss history
 
 ```python
 class LossHistory(keras.callbacks.Callback):
-    def on_train_begin(self):
+    def on_train_begin(self, logs={}):
         self.losses = []
 
     def on_batch_end(self, batch, logs={}):
@@ -71,7 +88,7 @@ print history.losses
 
 ---
 
-### Example to checkpoint models
+### Example: model checkpoints
 
 ```python
 from keras.callbacks import ModelCheckpoint
@@ -84,7 +101,7 @@ model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
 '''
 saves the model weights after each epoch if the validation loss decreased
 '''
-checkpointer = ModelCheckpoint(filename="weights.hdf5", path="/tmp", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="/tmp/weights.hdf5", verbose=1, save_best_only=True)
 model.fit(X_train, Y_train, batch_size=128, nb_epoch=20, verbose=0, validation_data=(X_test, Y_test), callbacks=[checkpointer])
 
 ```

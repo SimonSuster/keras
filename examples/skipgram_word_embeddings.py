@@ -54,6 +54,8 @@ load_tokenizer = False
 train_model = True
 #save_dir = os.path.expanduser("~/.keras/models")
 save_dir = "/home/p262594/Apps/keras/output"
+if not os.path.exists(save_dir):
+    os.makedirs(save_dir)
 model_load_fname = "HN_skipgram_model.pkl"
 model_save_fname = "bllip100k_skip100_ep2_dim50_maxf12901.pkl"
 tokenizer_fname = "bllip100k_skip100_maxf50k_tok.pkl"
